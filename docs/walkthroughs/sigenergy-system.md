@@ -32,7 +32,7 @@ Before starting this configuration, ensure you have:
 
 ### Required Integrations
 
-- **HAEO**: Installed via HACS (see [Installation guide](../installation.md))
+- **HAEO**: Installed via HACS (see [Installation guide](../user-guide/installation.md))
 - **Sigenergy**: Provides battery capacity and SOC sensors
 - **Solar Forecast**: [Open-Meteo Solar Forecast](https://www.home-assistant.io/integrations/open_meteo_solar_forecast/) integration
 - **Electricity Pricing**: Any integration providing import/export price forecasts
@@ -41,32 +41,23 @@ Before starting this configuration, ensure you have:
 
 - Multiple solar array orientations configured in forecast integration
 - Battery SOC sensor available from Sigenergy integration
-- Constant load value determined (see [Load configuration](../elements/load.md#determining-your-baseline))
+- Constant load value determined (see [Load configuration](../user-guide/elements/load.md#determining-your-baseline))
 
 ## Configuration Steps
 
-### Step 1: Create HAEO Network
+### Step 1: Log In and Add HAEO
 
-Configure the network through Settings → Devices & Services → Add Integration → HAEO:
+Log in to your Home Assistant instance, navigate to **Settings → Devices & services**, and add the HAEO integration.
+Enter a name for your energy network — this example uses "Sigenergy System".
 
-| Field                | Value            |
-| -------------------- | ---------------- |
-| **Name**             | Sigenergy System |
-| **Planning Horizon** | Custom           |
-| **Advanced Mode**    | Off              |
+```guide
+login(page)
 
-In the Custom Tiers step, enter the tier configuration:
-
-| Field               | Value |
-| ------------------- | ----- |
-| **Tier 1 Count**    | 5     |
-| **Tier 1 Duration** | 1     |
-| **Tier 2 Count**    | 11    |
-| **Tier 2 Duration** | 5     |
-| **Tier 3 Count**    | 46    |
-| **Tier 3 Duration** | 30    |
-| **Tier 4 Count**    | 48    |
-| **Tier 4 Duration** | 60    |
+add_integration(
+    page,
+    network_name="Sigenergy System",
+)
+```
 
 After submitting, you should see a Switchboard element already exists.
 This is the AC power balance point where grid and loads connect.
@@ -76,12 +67,15 @@ This is the AC power balance point where grid and loads connect.
 The Inverter element models your hybrid inverter with its built-in DC bus.
 Battery and solar will connect to this element.
 
-| Field                  | Value                          |
-| ---------------------- | ------------------------------ |
-| **Name**               | Inverter                       |
-| **AC Connection**      | Switchboard                    |
-| **Max DC to AC power** | `Sigen Plant Max Active Power` |
-| **Max AC to DC power** | `Sigen Plant Max Active Power` |
+```guide
+add_inverter(
+    page,
+    name="Inverter",
+    connection="Switchboard",
+    max_power_source_target=EntityInput("max active power", "Sigen Plant Max Active Power"),
+    max_power_target_source=EntityInput("max active power", "Sigen Plant Max Active Power"),
+)
+```
 
 !!! tip "Selecting Sensors"
 
@@ -90,20 +84,21 @@ Battery and solar will connect to this element.
 
 ### Step 3: Add Battery
 
-Configure the Sigenergy battery, connecting to the Inverter's DC side:
+Configure the Sigenergy battery, connecting to the Inverter's DC side.
 
-| Field                         | Value                                     |
-| ----------------------------- | ----------------------------------------- |
-| **Name**                      | Battery                                   |
-| **Connection**                | Inverter                                  |
-| **Capacity**                  | `Sigen Plant Rated Energy Capacity`       |
-| **Current Charge Percentage** | `Sigen Plant Battery State of Charge`     |
-| **Min Charge Percentage**     | 10                                        |
-| **Max Charge Percentage**     | 100                                       |
-| **Discharge efficiency**      | 99                                        |
-| **Charge efficiency**         | 99                                        |
-| **Max Charge Power**          | `Sigen Plant Ess Rated Charging Power`    |
-| **Max Discharge Power**       | `Sigen Plant Ess Rated Discharging Power` |
+```guide
+add_battery(
+    page,
+    name="Battery",
+    connection="Inverter",
+    capacity=EntityInput("rated energy", "Rated Energy Capacity"),
+    initial_charge_percentage=EntityInput("state of charge", "Battery State of Charge"),
+    max_power_target_source=EntityInput("rated charging", "Rated Charging Power"),
+    max_power_source_target=EntityInput("rated discharging", "Rated Discharging Power"),
+    min_charge_percentage=ConstantInput(10),
+    max_charge_percentage=ConstantInput(100),
+)
+```
 
 !!! tip "Searching for Battery Sensors"
 
@@ -116,25 +111,21 @@ Configure the Sigenergy battery, connecting to the Inverter's DC side:
 
 ### Step 4: Add Solar
 
-Configure solar arrays with forecast sensors for each orientation, connecting to the Inverter's DC side:
+Configure solar arrays with forecast sensors for each orientation, connecting to the Inverter's DC side.
 
-| Field           | Value         |
-| --------------- | ------------- |
-| **Name**        | Solar         |
-| **Connection**  | Inverter      |
-| **Forecast**    | *(see below)* |
-| **Curtailment** | Yes           |
-
-For the Forecast field, use the "Add entity" button to select multiple sensors.
-With Open-Meteo Solar Forecast for four orientations, search and select:
-
-1. Search "East solar" → Select "East solar production forecast...today"
-2. Click "Add entity"
-3. Search "North solar" → Select "North solar production forecast...today"
-4. Click "Add entity"
-5. Search "South solar" → Select "South solar production forecast...today"
-6. Click "Add entity"
-7. Search "West solar" → Select "West solar production forecast...today"
+```guide
+add_solar(
+    page,
+    name="Solar",
+    connection="Inverter",
+    forecast=[
+        EntityInput("east solar today", "East solar production forecast"),
+        EntityInput("north solar today", "North solar production forecast"),
+        EntityInput("south solar today", "South solar prediction forecast"),
+        EntityInput("west solar today", "West solar production forecast"),
+    ],
+)
+```
 
 !!! tip "Multi-Select Entity Pickers"
 
@@ -143,16 +134,25 @@ With Open-Meteo Solar Forecast for four orientations, search and select:
 
 ### Step 5: Add Grid Connection
 
-Configure grid with pricing and limits, connecting to the Switchboard:
+Configure grid with pricing and limits, connecting to the Switchboard.
 
-| Field            | Value                  |
-| ---------------- | ---------------------- |
-| **Name**         | Grid                   |
-| **Connection**   | Switchboard            |
-| **Import Price** | `Home - General Price` |
-| **Export Price** | `Home - Feed In Price` |
-| **Import Limit** | 55                     |
-| **Export Limit** | 30                     |
+```guide
+add_grid(
+    page,
+    name="Grid",
+    connection="Switchboard",
+    price_source_target=[
+        EntityInput("general price", "Home - General Price"),
+        EntityInput("general forecast", "Home - General Forecast"),
+    ],
+    price_target_source=[
+        EntityInput("feed in price", "Home - Feed In Price"),
+        EntityInput("feed in forecast", "Home - Feed In Forecast"),
+    ],
+    max_power_source_target=ConstantInput(55),
+    max_power_target_source=ConstantInput(30),
+)
+```
 
 !!! tip "Finding Price Sensors"
 
@@ -162,32 +162,36 @@ Configure grid with pricing and limits, connecting to the Switchboard:
 
 ### Step 6: Add Load
 
-Configure the base load consumption, connecting to the Switchboard:
+Configure the base load consumption, connecting to the Switchboard.
 
-| Field          | Value                        |
-| -------------- | ---------------------------- |
-| **Name**       | Load                         |
-| **Connection** | Switchboard                  |
-| **Forecast**   | `Sigen Plant Consumed Power` |
+```guide
+add_load(
+    page,
+    name="Constant Load",
+    connection="Switchboard",
+    forecast=ConstantInput(1),
+)
+```
 
 !!! tip "Load Sensors"
 
-    Search for "consumed" to find consumption forecast sensors.
     If you don't have a load forecast, create an `input_number` helper for constant load:
 
     1. Settings → Devices & Services → Helpers
     2. Create Helper → Number
     3. Name: "Constant Load Power", Unit: kW, Value: 1.0
 
+### Step 7: Verify Setup
+
+After completing configuration, verify that all elements were created successfully.
+
+```guide
+verify_setup(page)
+```
+
 ## Verification
 
-After completing configuration:
-
-1. **Navigate to Settings → Devices & Services → HAEO**
-2. **Click on "Sigenergy System" hub** to view the device page
-3. **Verify devices and entities**: Confirm devices appear for each configured element
-4. **Wait for first optimization** - Allow initial run to complete (may take 5-30 seconds)
-5. **Check optimization status** - Should show `success`
+Navigate to **Settings → Devices & Services → HAEO** and click on "Sigenergy System" to view the device page.
 
 ### Expected Device Hierarchy
 
@@ -201,7 +205,7 @@ In the HAEO integration page, you should see:
 | Battery          | Battery  | Varies   |
 | Solar            | Solar    | Varies   |
 | Grid             | Grid     | Varies   |
-| Load             | Load     | Varies   |
+| Constant Load    | Load     | Varies   |
 
 ### Key Sensors to Monitor
 
@@ -267,7 +271,7 @@ The Inverter element simplifies configuration compared to manual DC/AC nets with
 - AC→DC charging cannot exceed inverter rating
 - Battery and solar share the DC bus capacity
 
-See [Node](../elements/node.md) for more on hybrid inverter modeling.
+See [Node](../user-guide/elements/node.md) for more on hybrid inverter modeling.
 
 ## Next Steps
 
@@ -279,7 +283,7 @@ See [Node](../elements/node.md) for more on hybrid inverter modeling.
 
     Review battery settings and partition options.
 
-    [:material-arrow-right: Battery guide](../elements/battery.md)
+    [:material-arrow-right: Battery guide](../user-guide/elements/battery.md)
 
 - :material-flash:{ .lg .middle } **Inverter configuration**
 
@@ -287,7 +291,7 @@ See [Node](../elements/node.md) for more on hybrid inverter modeling.
 
     Tune DC/AC power limits and efficiencies.
 
-    [:material-arrow-right: Inverter guide](../elements/inverter.md)
+    [:material-arrow-right: Inverter guide](../user-guide/elements/inverter.md)
 
 - :material-chart-line:{ .lg .middle } **Forecasts and sensors**
 
@@ -295,7 +299,7 @@ See [Node](../elements/node.md) for more on hybrid inverter modeling.
 
     Ensure pricing and solar forecasts cover your horizon.
 
-    [:material-arrow-right: Forecasts guide](../forecasts-and-sensors.md)
+    [:material-arrow-right: Forecasts guide](../user-guide/forecasts-and-sensors.md)
 
 - :material-graph:{ .lg .middle } **Optimization results**
 
@@ -303,6 +307,6 @@ See [Node](../elements/node.md) for more on hybrid inverter modeling.
 
     Interpret costs, power flows, and shadow prices.
 
-    [:material-arrow-right: Optimization guide](../optimization.md)
+    [:material-arrow-right: Optimization guide](../user-guide/optimization.md)
 
 </div>
