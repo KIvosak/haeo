@@ -164,6 +164,16 @@ class HaeoInputNumber(NumberEntity):
             self._base_extra_attrs["source_entities"] = self._source_entity_ids
         if field_info.direction:
             self._base_extra_attrs["direction"] = field_info.direction
+
+        # For list item fields, expose sibling fields from the list item
+        if len(self._field_path) > 2:  # noqa: PLR2004
+            own_field = self._field_path[2]
+            item = get_nested_config_value_by_path(subentry.data, self._field_path[:2])
+            if isinstance(item, Mapping):
+                for key, value in item.items():
+                    if key != own_field:
+                        self._base_extra_attrs[key] = value
+
         self._attr_extra_state_attributes = dict(self._base_extra_attrs)
 
         # Loaders for time series and scalar data
