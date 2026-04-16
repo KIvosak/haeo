@@ -382,6 +382,34 @@
       "error": { "missing_name": "Name is required", "name_exists": "A device with this name already exists" },
       "abort": { "reconfigure_successful": "Configuration updated successfully" }
     },
+    "policy": {
+      "flow_title": "Policies",
+      "entry_type": "Policies",
+      "initiate_flow": { "user": "Policies", "reconfigure": "Policies" },
+      "step": {
+        "user": {
+          "title": "Add policy",
+          "description": "Create a policy rule to control how power flows between elements",
+          "data": { "name": "Policy name", "price": "Price", "source": "Source", "target": "Target" }
+        },
+        "reconfigure": {
+          "title": "Policies",
+          "description": "Select a policy to edit or delete",
+          "data": { "action": "Action", "rule": "Policy" }
+        },
+        "edit_rule": {
+          "title": "Edit policy",
+          "description": "Modify this policy rule",
+          "data": { "name": "Policy name", "price": "Price", "source": "Source", "target": "Target" }
+        }
+      },
+      "error": {
+        "missing_name": "Policy name is required",
+        "name_exists": "A policy with this name already exists",
+        "source_target_same": "Source and target cannot be the same element"
+      },
+      "abort": { "no_rules": "No policy rules configured", "reconfigure_successful": "Policies updated successfully" }
+    },
     "solar": {
       "flow_title": "Solar",
       "entry_type": "Solar",
@@ -419,6 +447,7 @@
     "load": { "name": "{name}" },
     "network": { "name": "Optimizer" },
     "node": { "name": "{name}" },
+    "policy": { "name": "Policies" },
     "solar": { "name": "{name}" }
   },
   "entity": {
@@ -452,6 +481,7 @@
       "inverter_max_power_target_source": { "name": "Max AC to DC power" },
       "load_forecast": { "name": "Forecast" },
       "load_price_target_source": { "name": "Consumption value" },
+      "policy_price": { "name": "{rule_name} price" },
       "solar_forecast": { "name": "Forecast" },
       "solar_price_source_target": { "name": "Production price" }
     },
@@ -557,7 +587,8 @@
     "horizon_preset": {
       "options": { "2_days": "2 days", "3_days": "3 days", "5_days": "5 days", "7_days": "7 days", "custom": "Custom" }
     },
-    "input_source": { "choices": { "constant": "Constant", "entity": "Entity", "none": "None" } }
+    "input_source": { "choices": { "constant": "Constant", "entity": "Entity", "none": "None" } },
+    "policy_endpoint": { "choices": { "nodes": "Nodes", "none": "Any" } }
   },
   "services": {
     "optimize": {

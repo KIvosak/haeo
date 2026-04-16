@@ -28,10 +28,13 @@ from tests.guides.primitives.haeo import (
     add_inverter,
     add_load,
     add_node,
+    add_policies,
     add_solar,
     login,
+    reconfigure_policies,
     verify_setup,
 )
+from tests.guides.primitives.validation import validate_policies
 
 __all__ = [
     # Field value types
@@ -48,10 +51,13 @@ __all__ = [
     "add_inverter",
     "add_load",
     "add_node",
+    "add_policies",
     "add_solar",
     "guide_step",
     "login",
     "pause_screenshots",
+    "reconfigure_policies",
     "screenshot_context",
+    "validate_policies",
     "verify_setup",
 ]

@@ -220,16 +220,25 @@ class HAPage:
 
     # region: Form Interactions
 
-    def click_button(self, name: str) -> None:
+    def click_button(self, name: str, *, first: bool = False) -> None:
         """Click a button by accessible name.
 
         Captures a screenshot with the target indicator before clicking.
         Does not capture a result screenshot — downstream actions (e.g.,
         wait_for_dialog) capture the resulting state when it is ready.
+
+        Args:
+            name: Accessible name of the button to click.
+            first: If True, use the first matching button when multiple
+                buttons share the same accessible name (e.g., an add-subentry
+                button and a gear icon on an existing subentry row).
+
         """
         ctx = ScreenshotContext.current()
 
         button = self.page.get_by_role("button", name=name, exact=True)
+        if first:
+            button = button.first
         button.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
 
         if ctx:
@@ -302,6 +311,43 @@ class HAPage:
             option.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
             option.click()
             option.wait_for(state="hidden", timeout=DEFAULT_TIMEOUT)
+
+    def select_dropdown(self, label: str, option_text: str) -> None:
+        """Select an option from a SelectSelector in DROPDOWN mode.
+
+        HA renders SelectSelector DROPDOWN as ``ha-select`` wrapping
+        ``ha-md-select-option`` items. Clicking the select element opens
+        a menu of options.
+        """
+        # ha-selector-select wraps the ha-select component
+        selector = self.page.locator("ha-selector-select").filter(has_text=label)
+        selector.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+
+        # The ha-select element is the clickable trigger
+        ha_select = selector.locator("ha-select")
+        ha_select.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+
+        ctx = ScreenshotContext.current()
+        if ctx:
+            with ctx.scope(f"select_{label}"):
+                self._scroll_and_capture(ha_select)
+                self._capture_with_indicator("dropdown", ha_select)
+                ha_select.click()
+
+                option = self.page.get_by_role("option", name=option_text)
+                option.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                self._scroll_into_view(option)
+                self._capture_with_indicator("option", option)
+
+                option.click()
+                self.page.wait_for_timeout(300)
+                self._capture("selected")
+        else:
+            ha_select.click()
+            option = self.page.get_by_role("option", name=option_text)
+            option.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+            option.click()
+            self.page.wait_for_timeout(300)
 
     # endregion
 
@@ -470,6 +516,47 @@ class HAPage:
         else:
             spinbutton.clear()
             spinbutton.fill(value)
+
+    def choose_dropdown_multi(self, field_label: str, options: list[str]) -> None:
+        """Select multiple options from a SelectSelector nested inside a ChooseSelector.
+
+        Assumes a choice with a multi-select DROPDOWN is already active.
+        HA renders multi-select DROPDOWN as ``ha-generic-picker`` which opens
+        a "Select option" dialog when clicked. HA closes the dialog after
+        each selection, so we re-open the picker for each option.
+
+        Screenshots per option: dialog open, option indicator, result chip.
+        """
+        choose = self.page.locator("ha-selector-choose").filter(has_text=field_label)
+        choose.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+
+        picker = choose.locator("ha-picker-field")
+        picker.wait_for(state="attached", timeout=DEFAULT_TIMEOUT)
+
+        select_dialog = self.page.get_by_role("dialog", name="Select option")
+
+        ctx = ScreenshotContext.current()
+        if ctx:
+            with ctx.scope(f"dropdown_{field_label}"):
+                for option_text in options:
+                    with ctx.scope(option_text):
+                        picker.click()
+                        select_dialog.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                        item = select_dialog.locator(f":text('{option_text}')").first
+                        item.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                        self._capture("dialog")
+                        self._capture_with_indicator("select", item)
+                        item.click()
+                        self.page.wait_for_timeout(300)
+                        self._capture("selected")
+        else:
+            for option_text in options:
+                picker.click()
+                select_dialog.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                item = select_dialog.locator(f":text('{option_text}')").first
+                item.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+                item.click()
+                self.page.wait_for_timeout(300)
 
     # endregion
 
@@ -643,6 +730,45 @@ class HAPage:
     def submit(self) -> None:
         """Click Submit button."""
         self.click_button("Submit")
+
+    def select_list_option(self, option_text: str) -> None:
+        """Select an option from a SelectSelector in LIST mode.
+
+        LIST mode renders as a group of radio-style list items.
+        Clicking the list item container doesn't always toggle the radio
+        input, so we target the radio button by its value or the list
+        item's inner interactive element.
+        """
+        ctx = ScreenshotContext.current()
+        option = self.page.get_by_role("radio", name=option_text)
+        option.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+
+        if ctx:
+            with ctx.scope(f"select_list_{option_text}"):
+                self._scroll_and_capture(option)
+                self._capture_with_indicator("option", option)
+                option.click(timeout=DEFAULT_TIMEOUT)
+                self._capture("selected")
+        else:
+            option.click(timeout=DEFAULT_TIMEOUT)
+
+    def toggle_switch(self, name: str) -> None:
+        """Toggle a switch/checkbox by accessible name.
+
+        BooleanSelector fields render as ``ha-switch`` toggle elements.
+        """
+        switch = self.page.locator("ha-switch").filter(has_text=name)
+        switch.wait_for(state="visible", timeout=DEFAULT_TIMEOUT)
+
+        ctx = ScreenshotContext.current()
+        if ctx:
+            with ctx.scope(f"toggle_{name}"):
+                self._scroll_and_capture(switch)
+                self._capture_with_indicator("switch", switch)
+                switch.click(timeout=DEFAULT_TIMEOUT)
+                self._capture("toggled")
+        else:
+            switch.click(timeout=DEFAULT_TIMEOUT)
 
     # endregion
 

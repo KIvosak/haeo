@@ -21,6 +21,7 @@ from custom_components.haeo.core.model.const import OutputType
 from custom_components.haeo.core.model.element import Element
 from custom_components.haeo.core.model.output_data import OutputData
 from custom_components.haeo.core.model.reactive import output
+from custom_components.haeo.core.model.util.broadcast_to_sequence import broadcast_to_sequence
 
 from .segments import Segment, SegmentSpec, create_segment
 
@@ -48,6 +49,7 @@ class ConnectionElementConfig(TypedDict):
     target: str
     segments: NotRequired[dict[str, SegmentSpec]]
     tags: NotRequired[set[int]]
+    tag_costs: NotRequired[list[dict[str, Any]]]
 
 
 class Connection[TOutputName: str](Element[TOutputName]):
@@ -69,6 +71,7 @@ class Connection[TOutputName: str](Element[TOutputName]):
         segments: dict[str, SegmentSpec] | None = None,
         output_names: frozenset[TOutputName] | None = None,
         tags: set[int] | None = None,
+        tag_costs: list[dict[str, Any]] | None = None,
     ) -> None:
         """Initialize a unidirectional connection."""
         actual_output_names: frozenset[Any] = output_names if output_names is not None else CONNECTION_OUTPUT_NAMES
@@ -88,7 +91,8 @@ class Connection[TOutputName: str](Element[TOutputName]):
 
         # Per-tag power flows (set during initialization)
         # Default to a single tag (0) when no tags specified — always-tagged paradigm
-        self._tags: set[int] = tags if tags else {0}
+        self._tags: set[int] = set(tags) if tags else {0}
+        self._tag_costs: list[dict[str, Any]] = tag_costs or []
         self._power_in: dict[int, HighspyArray] = {}
         self._power_out: dict[int, HighspyArray] = {}
 
@@ -209,6 +213,14 @@ class Connection[TOutputName: str](Element[TOutputName]):
     def cost(self) -> Any:  # type: ignore[override]
         """Aggregate costs from all segments."""
         costs = [sc for seg in self._segments.values() if (sc := seg.cost()) is not None]
+
+        for tc in self._tag_costs:
+            tag = tc["tag"]
+            price = broadcast_to_sequence(tc.get("price"), self.n_periods)
+            if price is not None and tag in self._power_in:
+                tag_flow = self._power_in[tag]
+                costs.append(Highs.qsum(tag_flow * price * self.periods))
+
         if not costs:
             return None
         if len(costs) == 1:
