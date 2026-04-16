@@ -1,0 +1,651 @@
+﻿{
+  "config": {
+    "flow_title": "Nastavení HAEO",
+    "step": {
+      "user": {
+        "title": "Nastavení HAEO",
+        "description": "Nakonfigurujte svou soustavu a zvolte plánovací horizont, který odpovídá dostupnosti vašich predikčních dat.",
+        "data": {
+          "advanced_mode": "Pokročilý režim",
+          "horizon_preset": "Plánovací horizont",
+          "name": "Název soustavy"
+        },
+        "data_description": { "advanced_mode": "Zpřístupní další typy prvků pro složitější energetické soustavy." },
+        "sections": {
+          "advanced": { "data": { "advanced_mode": "Pokročilý režim" }, "name": "Pokročilá nastavení" },
+          "common": {
+            "data": { "horizon_preset": "Plánovací horizont", "name": "Název soustavy" },
+            "name": "Obecná nastavení"
+          }
+        }
+      },
+      "custom_tiers": {
+        "title": "Vlastní konfigurace úrovní",
+        "description": "Nakonfigurujte vlastní úrovně intervalů. Krátkodobé intervaly jsou jemnější pro přesnější řízení, zatímco dlouhodobé intervaly snižují složitost.",
+        "data": {
+          "tier_1_count": "Počet intervalů úrovně 1 (jemné)",
+          "tier_1_duration": "Délka úrovně 1 (minuty)",
+          "tier_2_count": "Počet intervalů úrovně 2 (krátkodobé)",
+          "tier_2_duration": "Délka úrovně 2 (minuty)",
+          "tier_3_count": "Počet intervalů úrovně 3 (střednědobé)",
+          "tier_3_duration": "Délka úrovně 3 (minuty)",
+          "tier_4_count": "Počet intervalů úrovně 4 (dlouhodobé)",
+          "tier_4_duration": "Délka úrovně 4 (minuty)"
+        }
+      }
+    },
+    "error": { "name_exists": "Soustava s tímto názvem již existuje" },
+    "abort": { "already_configured": "HAEO je již nastaveno" }
+  },
+  "options": {
+    "step": {
+      "custom_tiers": {
+        "title": "Vlastní konfigurace úrovní",
+        "description": "Nakonfigurujte vlastní úrovně intervalů. Krátkodobé intervaly jsou jemnější pro přesnější řízení, zatímco dlouhodobé intervaly snižují složitost.",
+        "data": {
+          "tier_1_count": "Počet intervalů úrovně 1 (jemné)",
+          "tier_1_duration": "Délka úrovně 1 (minuty)",
+          "tier_2_count": "Počet intervalů úrovně 2 (krátkodobé)",
+          "tier_2_duration": "Délka úrovně 2 (minuty)",
+          "tier_3_count": "Počet intervalů úrovně 3 (střednědobé)",
+          "tier_3_duration": "Délka úrovně 3 (minuty)",
+          "tier_4_count": "Počet intervalů úrovně 4 (dlouhodobé)",
+          "tier_4_duration": "Délka úrovně 4 (minuty)"
+        }
+      },
+      "init": {
+        "title": "Nastavení HAEO",
+        "description": "Nakonfigurujte parametry optimalizace. Zvolte plánovací horizont, který odpovídá dostupnosti vašich predikčních dat.",
+        "data": {
+          "advanced_mode": "Pokročilý režim",
+          "debounce_seconds": "Zpoždění přepočtu (s)",
+          "horizon_preset": "Plánovací horizont",
+          "record_forecasts": "Zaznamenávat data predikce"
+        },
+        "data_description": {
+          "advanced_mode": "Zpřístupní další typy prvků pro složitější energetické soustavy.",
+          "record_forecasts": "Je-li povoleno, atributy predikce se ukládají do databáze recorderu. To výrazně zvětší databázi, ale umožní ladit historické predikce. Ve výchozím stavu je vypnuto kvůli omezení zátěže databáze."
+        },
+        "sections": {
+          "advanced": {
+            "data": {
+              "advanced_mode": "Pokročilý režim",
+              "debounce_seconds": "Zpoždění přepočtu (s)",
+              "record_forecasts": "Zaznamenávat data predikce"
+            },
+            "name": "Pokročilá nastavení"
+          },
+          "common": { "data": { "horizon_preset": "Plánovací horizont" }, "name": "Obecná nastavení" }
+        }
+      }
+    },
+    "error": {
+      "cannot_connect_to_self": "Zařízení nelze propojit samo se sebou",
+      "invalid_name": "Neplatný název zařízení",
+      "max_power_must_be_positive_for_bidirectional": "Maximální výkon musí být pro obousměrná propojení kladný",
+      "min_power_negative_not_allowed_unidirectional": "Minimální výkon nemůže být u jednosměrných propojení záporný",
+      "min_power_too_high": "Minimální výkon musí být menší nebo roven maximálnímu výkonu",
+      "name_exists": "Zařízení s tímto názvem již existuje"
+    },
+    "abort": {
+      "no_participants": "K této soustavě momentálně nejsou připojena žádná zařízení",
+      "reload_failed": "Po změně konfigurace se integraci nepodařilo znovu načíst. Zkontrolujte konfiguraci a zkuste to znovu."
+    }
+  },
+  "config_subentries": {
+    "battery": {
+      "flow_title": "Baterie",
+      "entry_type": "Baterie",
+      "initiate_flow": { "user": "Baterie", "reconfigure": "Baterie" },
+      "step": {
+        "user": {
+          "title": "Konfigurace baterie",
+          "description": "Nakonfigurujte parametry baterie pro energetickou optimalizaci",
+          "data": {
+            "capacity": "Kapacita",
+            "configure_partitions": "Nakonfigurovat rozdělení baterie",
+            "connection": "Propojení",
+            "efficiency_source_target": "Účinnost vybíjení",
+            "efficiency_target_source": "Účinnost nabíjení",
+            "initial_charge_percentage": "Stav nabití",
+            "max_charge_percentage": "Maximální úroveň nabití",
+            "max_power_source_target": "Max. vybíjecí výkon",
+            "max_power_target_source": "Max. nabíjecí výkon",
+            "min_charge_percentage": "Minimální úroveň nabití",
+            "name": "Název baterie",
+            "price_source_target": "Cena vybíjení",
+            "price_target_source": "Cena nabíjení",
+            "salvage_value": "Zůstatková hodnota"
+          },
+          "sections": {
+            "common": { "data": { "connection": "Propojení", "name": "Název baterie" }, "name": "Obecná nastavení" },
+            "efficiency": {
+              "data": {
+                "efficiency_source_target": "Účinnost vybíjení",
+                "efficiency_target_source": "Účinnost nabíjení"
+              },
+              "name": "Účinnost baterie"
+            },
+            "limits": {
+              "data": {
+                "max_charge_percentage": "Maximální úroveň nabití",
+                "min_charge_percentage": "Minimální úroveň nabití"
+              },
+              "name": "Limity"
+            },
+            "partitioning": {
+              "data": { "configure_partitions": "Nakonfigurovat rozdělení baterie" },
+              "name": "Rozdělení baterie"
+            },
+            "power_limits": {
+              "data": {
+                "max_power_source_target": "Max. vybíjecí výkon",
+                "max_power_target_source": "Max. nabíjecí výkon"
+              },
+              "name": "Limity výkonu"
+            },
+            "pricing": {
+              "data": {
+                "price_source_target": "Cena vybíjení",
+                "price_target_source": "Cena nabíjení",
+                "salvage_value": "Zůstatková hodnota"
+              },
+              "name": "Ceny"
+            },
+            "storage": {
+              "data": { "capacity": "Kapacita", "initial_charge_percentage": "Stav nabití" },
+              "name": "Úložiště"
+            }
+          }
+        },
+        "partition_values": {
+          "title": "Hodnoty rozdělení baterie",
+          "description": "Zadejte hodnoty pro vstupní zdroje rozdělení",
+          "data": { "cost": "Náklad", "percentage": "Procento" }
+        },
+        "partitions": {
+          "title": "Rozdělení baterie",
+          "description": "Vyberte entity pro oblasti podvybití a přebití",
+          "data": { "cost": "Náklad", "percentage": "Procento" },
+          "sections": {
+            "overcharge": {
+              "data": { "cost": "Cena přebití", "percentage": "Procento přebití" },
+              "name": "Nastavení přebití"
+            },
+            "undercharge": {
+              "data": { "cost": "Cena podvybití", "percentage": "Procento podvybití" },
+              "name": "Nastavení podvybití"
+            }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "battery_section": {
+      "flow_title": "Sekce baterie",
+      "entry_type": "Sekce baterie",
+      "initiate_flow": { "user": "Sekce baterie", "reconfigure": "Sekce baterie" },
+      "step": {
+        "user": {
+          "title": "Konfigurace sekce baterie",
+          "description": "Nakonfigurujte jednu sekci baterie s explicitní kapacitou a počátečním nabitím. Propojení s ostatními prvky řešte pomocí prvků Propojení.",
+          "data": { "capacity": "Kapacita", "initial_charge": "Počáteční nabití", "name": "Název sekce baterie" },
+          "sections": {
+            "common": { "data": { "name": "Název sekce baterie" }, "name": "Obecná nastavení" },
+            "storage": { "data": { "capacity": "Kapacita", "initial_charge": "Počáteční nabití" }, "name": "Úložiště" }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "connection": {
+      "flow_title": "Propojení",
+      "entry_type": "Propojení",
+      "initiate_flow": { "user": "Propojení", "reconfigure": "Propojení" },
+      "step": {
+        "user": {
+          "title": "Konfigurace propojení",
+          "description": "Nakonfigurujte parametry propojení mezi zařízeními",
+          "data": {
+            "efficiency_source_target": "Účinnost ze zdroje do cíle",
+            "efficiency_target_source": "Účinnost z cíle do zdroje",
+            "max_power_source_target": "Max. výkon ze zdroje do cíle",
+            "max_power_target_source": "Max. výkon z cíle do zdroje",
+            "mirror_segment_order": "Zrcadlit pořadí segmentů",
+            "name": "Název propojení",
+            "price_source_target": "Cena ze zdroje do cíle",
+            "price_target_source": "Cena z cíle do zdroje",
+            "source": "Zdrojové zařízení",
+            "target": "Cílové zařízení"
+          },
+          "sections": {
+            "common": { "data": { "name": "Název propojení" }, "name": "Obecná nastavení" },
+            "efficiency": {
+              "data": {
+                "efficiency_source_target": "Účinnost ze zdroje do cíle",
+                "efficiency_target_source": "Účinnost z cíle do zdroje"
+              },
+              "name": "Účinnost propojení"
+            },
+            "endpoints": {
+              "data": { "source": "Zdrojové zařízení", "target": "Cílové zařízení" },
+              "name": "Koncové body"
+            },
+            "power_limits": {
+              "data": {
+                "max_power_source_target": "Max. výkon ze zdroje do cíle",
+                "max_power_target_source": "Max. výkon z cíle do zdroje"
+              },
+              "name": "Limity výkonu"
+            },
+            "pricing": {
+              "data": {
+                "price_source_target": "Cena ze zdroje do cíle",
+                "price_target_source": "Cena z cíle do zdroje"
+              },
+              "name": "Ceny"
+            },
+            "segment_order": {
+              "data": { "mirror_segment_order": "Zrcadlit pořadí segmentů" },
+              "name": "Pořadí segmentů"
+            }
+          }
+        }
+      },
+      "error": {
+        "cannot_connect_to_self": "Zařízení nelze propojit samo se sebou",
+        "max_power_must_be_positive_for_bidirectional": "Maximální výkon musí být pro obousměrná propojení kladný",
+        "min_power_negative_not_allowed_unidirectional": "Minimální výkon nemůže být u jednosměrných propojení záporný",
+        "min_power_too_high": "Minimální výkon musí být menší nebo roven maximálnímu výkonu",
+        "missing_name": "Název je povinný",
+        "name_exists": "Zařízení s tímto názvem již existuje"
+      },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "grid": {
+      "flow_title": "Síť",
+      "entry_type": "Síť",
+      "initiate_flow": { "user": "Síť", "reconfigure": "Síť" },
+      "step": {
+        "user": {
+          "title": "Konfigurace sítě",
+          "description": "Nakonfigurujte parametry odběru a dodávky sítě a související ceny",
+          "data": {
+            "connection": "Propojení",
+            "max_power_source_target": "Limit odběru",
+            "max_power_target_source": "Limit dodávky",
+            "name": "Název sítě",
+            "price_source_target": "Cena odběru",
+            "price_target_source": "Cena dodávky"
+          },
+          "sections": {
+            "common": { "data": { "connection": "Propojení", "name": "Název sítě" }, "name": "Obecná nastavení" },
+            "power_limits": {
+              "data": { "max_power_source_target": "Limit odběru", "max_power_target_source": "Limit dodávky" },
+              "name": "Limity výkonu"
+            },
+            "pricing": {
+              "data": { "price_source_target": "Cena odběru", "price_target_source": "Cena dodávky" },
+              "name": "Ceny"
+            }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "inverter": {
+      "flow_title": "Střídač",
+      "entry_type": "Střídač",
+      "initiate_flow": { "user": "Střídač", "reconfigure": "Střídač" },
+      "step": {
+        "user": {
+          "title": "Konfigurace střídače",
+          "description": "Nakonfigurujte obousměrný střídač s DC sběrnicí pro připojení baterie a solárního zdroje",
+          "data": {
+            "connection": "AC propojení",
+            "efficiency_source_target": "Účinnost DC -\u003e AC",
+            "efficiency_target_source": "Účinnost AC -\u003e DC",
+            "max_power_source_target": "Max. výkon DC -\u003e AC",
+            "max_power_target_source": "Max. výkon AC -\u003e DC",
+            "name": "Název střídače"
+          },
+          "sections": {
+            "common": {
+              "data": { "connection": "AC propojení", "name": "Název střídače" },
+              "name": "Obecná nastavení"
+            },
+            "efficiency": {
+              "data": {
+                "efficiency_source_target": "Účinnost DC -\u003e AC",
+                "efficiency_target_source": "Účinnost AC -\u003e DC"
+              },
+              "name": "Účinnost střídače"
+            },
+            "power_limits": {
+              "data": {
+                "max_power_source_target": "Max. výkon DC -\u003e AC",
+                "max_power_target_source": "Max. výkon AC -\u003e DC"
+              },
+              "name": "Limity výkonu"
+            }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "load": {
+      "flow_title": "Zátěž",
+      "entry_type": "Zátěž",
+      "initiate_flow": { "user": "Zátěž", "reconfigure": "Zátěž" },
+      "step": {
+        "user": {
+          "title": "Konfigurace zátěže",
+          "description": "Nakonfigurujte zátěž s predikcí nebo konstantním výkonem.\n\n[HAFO]({hafo_url}) lze použít pro generování predikčních senzorů.",
+          "data": {
+            "connection": "Propojení",
+            "curtailment": "Povolit omezení zátěže",
+            "forecast": "Predikce",
+            "name": "Název zátěže",
+            "price_target_source": "Hodnota spotřeby"
+          },
+          "sections": {
+            "common": { "data": { "connection": "Propojení", "name": "Název zátěže" }, "name": "Obecná nastavení" },
+            "curtailment": { "data": { "curtailment": "Povolit omezení zátěže" }, "name": "Omezení zátěže" },
+            "forecast": { "data": { "forecast": "Predikce" }, "name": "Predikce" },
+            "pricing": { "data": { "price_target_source": "Hodnota spotřeby" }, "name": "Hodnota" }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "network": {
+      "flow_title": "HAEO",
+      "entry_type": "HAEO",
+      "initiate_flow": { "user": "HAEO", "reconfigure": "HAEO" },
+      "step": {},
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "node": {
+      "flow_title": "Uzel",
+      "entry_type": "Uzel",
+      "initiate_flow": { "user": "Uzel", "reconfigure": "Uzel" },
+      "step": {
+        "user": {
+          "title": "Konfigurace uzlu",
+          "description": "Přidejte uzel pro výpočty výkonové bilance nebo jako neomezený zdroj/odběr výkonu.",
+          "data": {
+            "is_sink": "Může odebírat neomezený výkon (sink)",
+            "is_source": "Může dodávat neomezený výkon (source)",
+            "name": "Název uzlu"
+          },
+          "sections": {
+            "common": { "data": { "name": "Název uzlu" }, "name": "Obecná nastavení" },
+            "role": {
+              "data": {
+                "is_sink": "Může odebírat neomezený výkon (sink)",
+                "is_source": "Může dodávat neomezený výkon (source)"
+              },
+              "name": "Role uzlu"
+            }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    },
+    "policy": {
+      "flow_title": "Politiky",
+      "entry_type": "Politika",
+      "initiate_flow": { "user": "Politika", "reconfigure": "Politiky" },
+      "step": {
+        "user": {
+          "title": "Přidat politiku",
+          "description": "Vytvořte pravidlo politiky pro řízení toku výkonu mezi prvky",
+          "data": {
+            "enabled": "Povoleno",
+            "name": "Název politiky",
+            "price": "Cena",
+            "source": "Zdroj",
+            "target": "Cíl"
+          }
+        },
+        "reconfigure": {
+          "title": "Politiky",
+          "description": "Vyberte politiku k úpravě nebo odstranění",
+          "data": { "action": "Akce", "rule": "Politika" }
+        },
+        "edit_rule": {
+          "title": "Upravit politiku",
+          "description": "Upravit toto pravidlo politiky",
+          "data": {
+            "enabled": "Povoleno",
+            "name": "Název politiky",
+            "price": "Cena",
+            "source": "Zdroj",
+            "target": "Cíl"
+          }
+        }
+      },
+      "error": {
+        "missing_name": "Název politiky je povinný",
+        "name_exists": "Politika s tímto názvem již existuje",
+        "source_target_same": "Zdroj a cíl nemohou být stejný prvek"
+      },
+      "abort": {
+        "no_rules": "Nejsou nakonfigurována žádná pravidla politiky",
+        "reconfigure_successful": "Politiky byly úspěšně aktualizovány"
+      }
+    },
+    "solar": {
+      "flow_title": "Solární zdroj",
+      "entry_type": "Solární zdroj",
+      "initiate_flow": { "user": "Solární zdroj", "reconfigure": "Solární zdroj" },
+      "step": {
+        "user": {
+          "title": "Konfigurace solárního zdroje",
+          "description": "Nakonfigurujte predikci solárního zdroje a související parametry",
+          "data": {
+            "connection": "Propojení",
+            "curtailment": "Povolit omezení výroby",
+            "forecast": "Predikce",
+            "name": "Název solárního zdroje",
+            "price_source_target": "Cena výroby"
+          },
+          "sections": {
+            "common": {
+              "data": { "connection": "Propojení", "name": "Název solárního zdroje" },
+              "name": "Obecná nastavení"
+            },
+            "curtailment": { "data": { "curtailment": "Povolit omezení výroby" }, "name": "Omezení výroby" },
+            "forecast": { "data": { "forecast": "Predikce" }, "name": "Predikce" },
+            "pricing": { "data": { "price_source_target": "Cena výroby" }, "name": "Ceny" }
+          }
+        }
+      },
+      "error": { "missing_name": "Název je povinný", "name_exists": "Zařízení s tímto názvem již existuje" },
+      "abort": { "reconfigure_successful": "Konfigurace byla úspěšně aktualizována" }
+    }
+  },
+  "common": {
+    "default_hub_name": "Domácnost",
+    "network_subentry_name": "Soustava",
+    "switchboard_node_name": "Rozvaděč"
+  },
+  "device": {
+    "battery": { "name": "{name}" },
+    "battery_section": { "name": "{name}" },
+    "connection": { "name": "{name}" },
+    "grid": { "name": "{name}" },
+    "inverter": { "name": "{name}" },
+    "load": { "name": "{name}" },
+    "network": { "name": "Optimalizátor" },
+    "node": { "name": "{name}" },
+    "policy": { "name": "Politiky" },
+    "solar": { "name": "{name}" }
+  },
+  "entity": {
+    "number": {
+      "battery_capacity": { "name": "Kapacita" },
+      "battery_cost": { "name": "Náklad" },
+      "battery_efficiency_source_target": { "name": "Účinnost vybíjení" },
+      "battery_efficiency_target_source": { "name": "Účinnost nabíjení" },
+      "battery_initial_charge_percentage": { "name": "Počáteční nabití" },
+      "battery_max_charge_percentage": { "name": "Max. nabití" },
+      "battery_max_power_source_target": { "name": "Max. vybíjecí výkon" },
+      "battery_max_power_target_source": { "name": "Max. nabíjecí výkon" },
+      "battery_min_charge_percentage": { "name": "Min. nabití" },
+      "battery_percentage": { "name": "Procento" },
+      "battery_price_source_target": { "name": "Cena vybíjení" },
+      "battery_price_target_source": { "name": "Cena nabíjení" },
+      "battery_salvage_value": { "name": "Zůstatková hodnota" },
+      "connection_efficiency_source_target": { "name": "Účinnost ze zdroje do cíle" },
+      "connection_efficiency_target_source": { "name": "Účinnost z cíle do zdroje" },
+      "connection_max_power_source_target": { "name": "Max. výkon ze zdroje do cíle" },
+      "connection_max_power_target_source": { "name": "Max. výkon z cíle do zdroje" },
+      "connection_price_source_target": { "name": "Cena ze zdroje do cíle" },
+      "connection_price_target_source": { "name": "Cena z cíle do zdroje" },
+      "grid_max_power_source_target": { "name": "Limit odběru" },
+      "grid_max_power_target_source": { "name": "Limit dodávky" },
+      "grid_price_source_target": { "name": "Cena odběru" },
+      "grid_price_target_source": { "name": "Cena dodávky" },
+      "inverter_efficiency_source_target": { "name": "Účinnost DC -\u003e AC" },
+      "inverter_efficiency_target_source": { "name": "Účinnost AC -\u003e DC" },
+      "inverter_max_power_source_target": { "name": "Max. výkon DC -\u003e AC" },
+      "inverter_max_power_target_source": { "name": "Max. výkon AC -\u003e DC" },
+      "load_forecast": { "name": "Predikce" },
+      "load_price_target_source": { "name": "Hodnota spotřeby" },
+      "policy_price": { "name": "{rule_name} cena" },
+      "solar_forecast": { "name": "Predikce" },
+      "solar_price_source_target": { "name": "Cena výroby" }
+    },
+    "sensor": {
+      "battery_energy_in_flow": { "name": "Stínová cena toku energie dovnitř" },
+      "battery_energy_out_flow": { "name": "Stínová cena toku energie ven" },
+      "battery_energy_stored": { "name": "Uložená energie" },
+      "battery_power_active": { "name": "Činný výkon" },
+      "battery_power_balance": { "name": "Stínová cena výkonové bilance" },
+      "battery_power_charge": { "name": "Nabíjecí výkon" },
+      "battery_power_discharge": { "name": "Vybíjecí výkon" },
+      "battery_section_energy_in_flow": { "name": "Stínová cena toku energie dovnitř" },
+      "battery_section_energy_out_flow": { "name": "Stínová cena toku energie ven" },
+      "battery_section_energy_stored": { "name": "Uložená energie" },
+      "battery_section_power_active": { "name": "Činný výkon" },
+      "battery_section_power_balance": { "name": "Stínová cena výkonové bilance" },
+      "battery_section_power_charge": { "name": "Nabíjecí výkon" },
+      "battery_section_power_discharge": { "name": "Vybíjecí výkon" },
+      "battery_section_soc_max": { "name": "Stínová cena horní meze SOC" },
+      "battery_section_soc_min": { "name": "Stínová cena dolní meze SOC" },
+      "battery_soc_max": { "name": "Stínová cena horní meze SOC" },
+      "battery_soc_min": { "name": "Stínová cena dolní meze SOC" },
+      "battery_state_of_charge": { "name": "Stav nabití" },
+      "connection_power": { "name": "Výkon ze {source} do {target}" },
+      "grid_cost_import": { "name": "Náklad na odběr" },
+      "grid_cost_net": { "name": "Čistý náklad" },
+      "grid_power_active": { "name": "Činný výkon" },
+      "grid_power_export": { "name": "Dodávaný výkon" },
+      "grid_power_import": { "name": "Odebíraný výkon" },
+      "grid_power_max_export_price": { "name": "Stínová cena max. dodávaného výkonu" },
+      "grid_power_max_import_price": { "name": "Stínová cena max. odebíraného výkonu" },
+      "grid_revenue_export": { "name": "Výnos z dodávky" },
+      "horizon": { "name": "Horizont predikce" },
+      "inverter_dc_bus_power_balance": { "name": "Stínová cena výkonové bilance DC sběrnice" },
+      "inverter_max_power_ac_to_dc_price": { "name": "Stínová cena max. výkonu AC -\u003e DC" },
+      "inverter_max_power_dc_to_ac_price": { "name": "Stínová cena max. výkonu DC -\u003e AC" },
+      "inverter_power_ac_to_dc": { "name": "Výkon AC -\u003e DC" },
+      "inverter_power_active": { "name": "Činný výkon" },
+      "inverter_power_dc_to_ac": { "name": "Výkon DC -\u003e AC" },
+      "load_forecast_limit_price": { "name": "Stínová cena limitu predikce" },
+      "load_power": { "name": "Výkon" },
+      "network_optimization_cost": { "name": "Náklad" },
+      "network_optimization_duration": { "name": "Doba trvání" },
+      "network_optimization_status": { "name": "Stav" },
+      "node_power_balance": { "name": "Stínová cena výkonové bilance" },
+      "solar_forecast_limit": { "name": "Stínová cena limitu predikce" },
+      "solar_power": { "name": "Výkon" }
+    },
+    "switch": {
+      "load_curtailment": { "name": "Omezení zátěže" },
+      "network_auto_optimize": { "name": "Automaticky optimalizovat" },
+      "node_is_sink": { "name": "Může neomezeně odebírat výkon" },
+      "node_is_source": { "name": "Může neomezeně dodávat výkon" },
+      "solar_curtailment": { "name": "Omezení výroby" }
+    }
+  },
+  "exceptions": {
+    "config_entry_not_found": { "message": "Položka konfigurace {entry_id} nebyla nalezena" },
+    "config_entry_not_loaded": { "message": "Položka konfigurace {entry_id} není načtena (stav: {state})" },
+    "config_entry_wrong_domain": { "message": "Položka konfigurace {entry_id} není hub HAEO (doména: {domain})" },
+    "input_entities_not_ready": {
+      "message": "Vstupní entity nejsou po {timeout} sekundách připraveny: {not_ready}. Některé senzory ještě nemusí být dostupné."
+    },
+    "missing_sensors": {
+      "message": "HAEO nemůže načíst data pro {unavailable_sensors}. Ověřte, že každý odkazovaný senzor existuje a poskytuje data."
+    },
+    "no_history_at_time": {
+      "message": "V čase {time} není dostupná historie pro: {missing}. Recorder nemusí mít data tak daleko do minulosti."
+    },
+    "self_referential_field_missing": {
+      "message": "Chyba konfigurace pole {field}: byla vybrána entita vytvořená tímto polem, ale pole chybí v uložené konfiguraci. To může znamenat poškozená konfigurační data. Vytvořte prosím prvek znovu."
+    },
+    "self_referential_invalid_value": {
+      "message": "Chyba konfigurace pole {field}: byla vybrána entita vytvořená tímto polem, ale uložená hodnota není platný skalár (nalezeno {value_type}). To může znamenat poškozená konfigurační data. Vytvořte prosím prvek znovu."
+    },
+    "self_referential_no_current_data": {
+      "message": "Chyba konfigurace pole {field}: byla vybrána entita vytvořená tímto polem, ale neexistuje žádná předchozí konfigurace. To může znamenat poškozená konfigurační data. Vytvořte prosím prvek znovu."
+    },
+    "setup_failed_permanent": {
+      "message": "Inicializace selhala kvůli chybě konfigurace: {error}. Zkontrolujte prosím konfiguraci."
+    },
+    "setup_failed_transient": { "message": "Inicializace selhala: {error}. Home Assistant to zkusí znovu automaticky." }
+  },
+  "issues": {
+    "disconnected_network": {
+      "title": "Soustava obsahuje odpojené části",
+      "description": "Soustava obsahuje {num_components} odpojených skupin prvků, které si nemohou předávat výkon.\n\nJak problém opravit:\n1. Zkontrolujte následující skupiny: {component_summary}\n2. Otevřete možnosti konfigurace integrace HAEO\n3. Přidejte nebo upravte propojení tak, aby každý prvek patřil do stejné skupiny\n4. Uložte změny; problém se automaticky zruší, jakmile bude soustava plně propojena"
+    },
+    "invalid_config": {
+      "title": "Neplatná konfigurace prvku {element_name}",
+      "description": "Prvek {element_name} má neplatnou konfiguraci: {config_problem}\n\nJak problém opravit:\n1. Otevřete nastavení integrace HAEO\n2. Přejděte do konfigurace prvku {element_name}\n3. Opravte výše popsaný problém konfigurace\n4. Uložte změny a znovu načtěte integraci"
+    },
+    "missing_sensor": {
+      "title": "Chybí data senzoru pro prvek {element_name}",
+      "description": "Integrace HAEO nemůže najít data senzoru pro prvek {element_name}. Entita senzoru {sensor_entity_id} nemusí existovat nebo může být nedostupná.\n\nJak problém opravit:\n1. Ověřte, že entita senzoru v Home Assistantu existuje\n2. Ověřte, že je senzor dostupný a poskytuje data\n3. Pokud byl senzor odstraněn, překonfigurujte prvek na jiný senzor\n4. Pokud je senzor dočasně nedostupný, problém se po jeho opětovné dostupnosti automaticky zruší"
+    },
+    "optimization_failure": {
+      "title": "Optimalizace selhala",
+      "description": "Optimalizace HAEO selhala s následující chybou: {error_message}\n\nPříčinou může být:\n1. Chybějící nebo neplatná data senzorů či predikcí\n2. Konfliktní omezení ve vaší konfiguraci\n3. Problém se zvoleným solverem\n\nPostup řešení:\n1. Zkontrolujte logy Home Assistantu kvůli podrobné chybové informaci\n2. Ověřte, že všechny požadované senzory jsou dostupné a vracejí platná data\n3. Zkontrolujte konfiguraci soustavy kvůli konfliktním omezením\n4. Zkuste v nastavení integrace jiný optimalizační solver\n5. Problém se automaticky zruší, jakmile bude optimalizace úspěšná"
+    }
+  },
+  "selector": {
+    "horizon_preset": {
+      "options": { "2_days": "2 dny", "3_days": "3 dny", "5_days": "5 dnů", "7_days": "7 dnů", "custom": "Vlastní" }
+    },
+    "input_source": { "choices": { "constant": "Konstanta", "entity": "Entita", "none": "Žádný" } },
+    "policy_endpoint": { "choices": { "elements": "Prvky", "none": "Libovolný" } }
+  },
+  "services": {
+    "optimize": {
+      "description": "Spustí optimalizaci pro zadanou soustavu",
+      "fields": {
+        "config_entry": { "description": "Soustava HAEO, pro kterou se má spustit optimalizace", "name": "Soustava" }
+      },
+      "name": "Optimalizovat"
+    },
+    "save_diagnostics": {
+      "description": "Uloží diagnostický soubor do adresáře config",
+      "fields": {
+        "config_entry": { "description": "Soustava HAEO, pro kterou se má uložit diagnostika", "name": "Soustava" },
+        "time": {
+          "description": "Vygeneruje diagnostický soubor podle stavů entit v zadaném historickém čase. Pokud čas není zadán, použije aktuální stav.",
+          "name": "Čas"
+        }
+      },
+      "name": "Uložit diagnostiku"
+    }
+  }
+}
